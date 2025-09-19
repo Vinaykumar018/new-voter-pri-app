@@ -94,6 +94,29 @@ ipcMain.on('request-data-on-refresh', (event, pageType) => {
       break;
   }
 });
+// ✅ Handle sidebar navigation
+ipcMain.on('navigate-to', (event, page) => {
+  if (!mainWindow) return;
+  switch (page) {
+    case 'voting':
+      mainWindow.loadFile(path.join(__dirname, 'src', 'voting.html'));
+      break;
+    case 'sync':
+      mainWindow.loadFile(path.join(__dirname, 'src', 'sync.html'));
+      break;
+    case 'update':
+      mainWindow.loadFile(path.join(__dirname, 'src', 'update.html'));
+      break;
+    case 'view':
+      mainWindow.loadFile(path.join(__dirname, 'src', 'view.html'));
+      break;
+    case 'home':
+      mainWindow.loadFile(path.join(__dirname, 'src', 'home.html'));
+      break;
+  }
+});
+
+
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();

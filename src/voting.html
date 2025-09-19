@@ -83,14 +83,16 @@
       margin-bottom: 8px;
     }
 
-    .form-control, .form-select {
+    .form-control,
+    .form-select {
       border-radius: 8px;
       padding: 10px 15px;
       border: 1px solid #e2e8f0;
       transition: all 0.3s;
     }
 
-    .form-control:focus, .form-select:focus {
+    .form-control:focus,
+    .form-select:focus {
       border-color: var(--secondary-color);
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
     }
@@ -161,7 +163,8 @@
       border: none;
     }
 
-    h5, h6 {
+    h5,
+    h6 {
       color: var(--dark-text);
       font-weight: 600;
     }
@@ -182,7 +185,7 @@
         min-height: auto;
         padding: 15px;
       }
-      
+
       .header-info {
         padding: 12px 15px;
       }
@@ -196,18 +199,18 @@
       <!-- Sidebar -->
       <div class="col-md-2 sidebar">
         <h5 class="mb-4"><i class="fas fa-vote-yea me-2"></i> SECUP Tool</h5>
-        <a href="#" class="active"><i class="fas fa-user-plus me-2"></i>Add Voter</a>
-        <a href="#"><i class="fas fa-sync me-2"></i>Sync With Server</a>
-        <a href="#"><i class="fas fa-database me-2"></i>Update Masters</a>
-        <a href="#"><i class="fas fa-list me-2"></i>View All</a>
-        <a href="#"><i class="fas fa-home me-2"></i>Home</a>
+        <a href="#" data-page="voting" class="active" id="addVoterLink">Add Voter</a>
+        <a href="#" data-page="sync" id="syncLink">Sync With Server</a>
+        <a href="#" data-page="update" id="updateMastersLink">Update Masters</a>
+        <a href="#" data-page="view" id="viewAllLink">View All</a>
+        <a href="#" data-page="home" id="homeLink">Home</a>
       </div>
 
       <!-- Main Content -->
       <div class="col-md-10 p-4">
         <div class="header-info">
-          <h5 class="mb-2">Block: <span class="text-primary" id="blockHeader">-</span> | 
-            Gram Panchayat: <span class="text-success" id="gpHeader">-</span> | 
+          <h5 class="mb-2">Block: <span class="text-primary" id="blockHeader">-</span> |
+            Gram Panchayat: <span class="text-success" id="gpHeader">-</span> |
             Ward: <span class="text-danger">5</span>
           </h5>
           <p class="mb-0 text-muted">You are currently adding voters to the selected block and gram panchayat</p>
@@ -306,7 +309,8 @@
                 <tr>
                   <td>
                     <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit me-1"></i>Edit</a>
-                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i class="fas fa-trash me-1"></i>Delete</a>
+                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i
+                        class="fas fa-trash me-1"></i>Delete</a>
                   </td>
                   <td>13</td>
                   <td>Ravi Singh</td>
@@ -321,7 +325,8 @@
                 <tr>
                   <td>
                     <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit me-1"></i>Edit</a>
-                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i class="fas fa-trash me-1"></i>Delete</a>
+                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i
+                        class="fas fa-trash me-1"></i>Delete</a>
                   </td>
                   <td>14</td>
                   <td>Priya Sharma</td>
@@ -342,59 +347,79 @@
     </div>
   </div>
 
- <script>
-  const { ipcRenderer } = require('electron');
-  let navigationData = {};
+  <script>
+    const { ipcRenderer } = require('electron');
+    document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        const page = link.getAttribute('data-page');
+        ipcRenderer.send('navigate-to', page);
+      });
+    });
 
-  window.addEventListener('load', () => {
-    // Request data on page load (including refresh)
-    ipcRenderer.send('request-data-on-refresh', 'voting');
-  });
+    let navigationData = {};
 
-  // ✅ Receive all data from main process
-  ipcRenderer.on('set-all-data', (event, data) => {
-    console.log('Received all data:', data);
-    navigationData = data;
+    window.addEventListener('load', () => {
+      // Request data on page load (including refresh)
+      ipcRenderer.send('request-data-on-refresh', 'voting');
+    });
 
-    // Prefill disabled fields in the form
-    if (data.district) {
-      document.getElementById('districtName').value = data.district.name || '';
-    }
-    if (data.block) {
-      document.getElementById('blockName').value = data.block.name || '';
-      document.getElementById('blockHeader').textContent = data.block.name || '-';
-    }
-    if (data.gramPanchayat) {
-      document.getElementById('gramPanchayatName').value = data.gramPanchayat.name || '';
-      document.getElementById('gpHeader').textContent = data.gramPanchayat.name || '-';
-    }
+    // ✅ Receive all data from main process
+    ipcRenderer.on('set-all-data', (event, data) => {
+      console.log("hello")
+      console.log('Received all data:', data);
+      navigationData = data;
 
-    // ✅ If you want to prefill some other voter fields as well
-    // Example mock (you can replace with real data from API):
-    if (data.prefillVoter) {
-      document.querySelector('input[placeholder="Enter House No."]').value = data.prefillVoter.houseNo || '';
-      document.querySelector('input[placeholder="Name"]').value = data.prefillVoter.name || '';
-      document.querySelector('input[placeholder="Father/Husband Name"]').value = data.prefillVoter.fatherName || '';
-      document.querySelector('input[placeholder="Age"]').value = data.prefillVoter.age || '';
-      document.querySelector('input[placeholder="10 digit only"]').value = data.prefillVoter.mobile || '';
-      document.querySelector('input[placeholder="Enter Email"]').value = data.prefillVoter.email || '';
-
-      // Gender radio select
-      if (data.prefillVoter.gender) {
-        document.querySelector(`input[name="gender"][value="${data.prefillVoter.gender}"]`).checked = true;
+      // Prefill disabled fields in the form
+      if (data.district) {
+        document.getElementById('districtName').value = data.district.name || '';
       }
-    }
-  });
+      if (data.block) {
+        document.getElementById('blockName').value = data.block.name || '';
+        document.getElementById('blockHeader').textContent = data.block.name || '-';
+      }
+      if (data.gramPanchayat) {
+        document.getElementById('gramPanchayatName').value = data.gramPanchayat.name || '';
+        document.getElementById('gpHeader').textContent = data.gramPanchayat.name || '-';
+      }
 
-  
-  document.getElementById('backBtn').addEventListener('click', () => {
-    if (navigationData.block) {
-      ipcRenderer.send('block-selected', navigationData.block);
-    } else {
-      ipcRenderer.send('block-selected');
-    }
-  });
-</script>
+      // ✅ If you want to prefill some other voter fields as well
+      // Example mock (you can replace with real data from API):
+      if (data.prefillVoter) {
+        document.querySelector('input[placeholder="Enter House No."]').value = data.prefillVoter.houseNo || '';
+        document.querySelector('input[placeholder="Name"]').value = data.prefillVoter.name || '';
+        document.querySelector('input[placeholder="Father/Husband Name"]').value = data.prefillVoter.fatherName || '';
+        document.querySelector('input[placeholder="Age"]').value = data.prefillVoter.age || '';
+        document.querySelector('input[placeholder="10 digit only"]').value = data.prefillVoter.mobile || '';
+        document.querySelector('input[placeholder="Enter Email"]').value = data.prefillVoter.email || '';
+
+        // Gender radio select
+        if (data.prefillVoter.gender) {
+          document.querySelector(`input[name="gender"][value="${data.prefillVoter.gender}"]`).checked = true;
+        }
+      }
+    });
+
+
+    document.getElementById('backBtn').addEventListener('click', () => {
+      if (navigationData.block) {
+        ipcRenderer.send('block-selected', navigationData.block);
+      } else {
+        ipcRenderer.send('block-selected');
+      }
+    });
+      document.querySelectorAll('.sidebar a').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        ipcRenderer.send('navigate-to', link.getAttribute('data-page'));
+      });
+    });
+
+
+
+
+  </script>
+
 
 </body>
 

@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SECUP Voter Entry Tool</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #1e3a8a;
+      --secondary-color: #3b82f6;
+      --accent-color: #0ea5e9;
+      --light-bg: #f8fafc;
+      --dark-text: #1e293b;
+      --success-color: #10b981;
+      --danger-color: #ef4444;
+    }
+
+    body {
+      background-color: var(--light-bg);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--dark-text);
+    }
+
+    .sidebar {
+      min-height: 100vh;
+      background: var(--primary-color);
+      color: white;
+      padding: 20px 10px;
+      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      display: block;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      background: var(--secondary-color);
+      transform: translateX(5px);
+    }
+
+    .sidebar h5 {
+      padding: 15px 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      margin-bottom: 20px;
+    }
+
+    .form-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      margin-bottom: 25px;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .table-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+    }
+
+    input:disabled {
+      background-color: #f1f5f9 !important;
+      color: #64748b !important;
+      border-color: #e2e8f0;
+    }
+
+    .form-label {
+      font-weight: 500;
+      color: #475569;
+      margin-bottom: 8px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+      padding: 10px 15px;
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus, .form-select:focus {
+      border-color: var(--secondary-color);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .header-info {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 25px;
+      border-left: 4px solid var(--secondary-color);
+    }
+
+    .btn-primary {
+      background: var(--secondary-color);
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-secondary {
+      background: #94a3b8;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-weight: 500;
+    }
+
+    .btn-success {
+      background: var(--success-color);
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+    }
+
+    .table thead th {
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 12px 15px;
+      font-weight: 500;
+    }
+
+    .table tbody td {
+      padding: 12px 15px;
+      vertical-align: middle;
+    }
+
+    .table-striped tbody tr:nth-of-type(odd) {
+      background-color: #f8fafc;
+    }
+
+    .btn-sm {
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.875rem;
+    }
+
+    .btn-danger {
+      background: var(--danger-color);
+      border: none;
+    }
+
+    h5, h6 {
+      color: var(--dark-text);
+      font-weight: 600;
+    }
+
+    h6 {
+      color: var(--primary-color);
+      padding-bottom: 10px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .required-field::after {
+      content: " *";
+      color: var(--danger-color);
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        min-height: auto;
+        padding: 15px;
+      }
+      
+      .header-info {
+        padding: 12px 15px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <!-- Sidebar -->
+      <div class="col-md-2 sidebar">
+        <h5 class="mb-4"><i class="fas fa-vote-yea me-2"></i> SECUP Tool</h5>
+        <a href="#" class="active"><i class="fas fa-user-plus me-2"></i>Add Voter</a>
+        <a href="#"><i class="fas fa-sync me-2"></i>Sync With Server</a>
+        <a href="#"><i class="fas fa-database me-2"></i>Update Masters</a>
+        <a href="#"><i class="fas fa-list me-2"></i>View All</a>
+        <a href="#"><i class="fas fa-home me-2"></i>Home</a>
+      </div>
+
+      <!-- Main Content -->
+      <div class="col-md-10 p-4">
+        <div class="header-info">
+          <h5 class="mb-2">Block: <span class="text-primary" id="blockHeader">-</span> | 
+            Gram Panchayat: <span class="text-success" id="gpHeader">-</span> | 
+            Ward: <span class="text-danger">5</span>
+          </h5>
+          <p class="mb-0 text-muted">You are currently adding voters to the selected block and gram panchayat</p>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+          <h6 class="mb-4"><i class="fas fa-user-plus me-2"></i>Add Voter (मतदाता का विवरण भरे)</h6>
+          <form class="row g-3">
+
+            <!-- Disabled Fields (Block, District, Gram Panchayat) -->
+            <div class="col-md-4">
+              <label class="form-label">Block</label>
+              <input type="text" class="form-control" id="blockName" disabled>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">District</label>
+              <input type="text" class="form-control" id="districtName" disabled>
+            </div>
+            <div class="col-md-4">
+              <label class="form-label">Gram Panchayat</label>
+              <input type="text" class="form-control" id="gramPanchayatName" disabled>
+            </div>
+
+            <!-- Normal Input Fields -->
+            <div class="col-md-4">
+              <label class="form-label required-field">मकान नंबर</label>
+              <input type="text" class="form-control" placeholder="Enter House No.">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required-field">सूचना नाम</label>
+              <input type="text" class="form-control" placeholder="Name">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label required-field">पिता/पति का नाम</label>
+              <input type="text" class="form-control" placeholder="Father/Husband Name">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required-field">लिंग</label><br>
+              <div class="form-check form-check-inline mt-2">
+                <input class="form-check-input" type="radio" name="gender" value="पुरुष">
+                <label class="form-check-label">पुरुष</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="gender" value="महिला">
+                <label class="form-check-label">महिला</label>
+              </div>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label required-field">आयु</label>
+              <input type="number" class="form-control" placeholder="Age">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">मोबाइल नंबर</label>
+              <input type="text" class="form-control" placeholder="10 digit only">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label">ईमेल</label>
+              <input type="email" class="form-control" placeholder="Enter Email">
+            </div>
+
+            <div class="col-12 mt-4">
+              <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Save</button>
+              <button type="reset" class="btn btn-secondary ms-2"><i class="fas fa-redo me-2"></i>Reset</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Table Section -->
+        <div class="table-section">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h6 class="mb-0"><i class="fas fa-list me-2"></i>Voter List (मतदाता सूची)</h6>
+            <button class="btn btn-success"><i class="fas fa-file-export me-2"></i>Export to Excel</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover">
+              <thead class="table-dark">
+                <tr>
+                  <th>Action</th>
+                  <th>House No.</th>
+                  <th>Name</th>
+                  <th>Father/Husband</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Email</th>
+                  <th>UID</th>
+                  <th>Contact No.</th>
+                  <th>PS Name</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit me-1"></i>Edit</a>
+                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i class="fas fa-trash me-1"></i>Delete</a>
+                  </td>
+                  <td>13</td>
+                  <td>Ravi Singh</td>
+                  <td>Ajay Singh</td>
+                  <td>Male</td>
+                  <td>55</td>
+                  <td>ravi@mail.com</td>
+                  <td>12345</td>
+                  <td>9876543210</td>
+                  <td>रामपुर बूथ</td>
+                </tr>
+                <tr>
+                  <td>
+                    <a href="#" class="btn btn-sm btn-primary"><i class="fas fa-edit me-1"></i>Edit</a>
+                    <a href="#" class="btn btn-sm btn-danger mt-1 mt-md-0 ms-md-1"><i class="fas fa-trash me-1"></i>Delete</a>
+                  </td>
+                  <td>14</td>
+                  <td>Priya Sharma</td>
+                  <td>Rajesh Sharma</td>
+                  <td>Female</td>
+                  <td>42</td>
+                  <td>priya@mail.com</td>
+                  <td>12346</td>
+                  <td>9876543211</td>
+                  <td>रामपुर बूथ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+ <script>
+  const { ipcRenderer } = require('electron');
+  let navigationData = {};
+
+  window.addEventListener('load', () => {
+    // Request data on page load (including refresh)
+    ipcRenderer.send('request-data-on-refresh', 'voting');
+  });
+
+  // ✅ Receive all data from main process
+  ipcRenderer.on('set-all-data', (event, data) => {
+    console.log('Received all data:', data);
+    navigationData = data;
+
+    // Prefill disabled fields in the form
+    if (data.district) {
+      document.getElementById('districtName').value = data.district.name || '';
+    }
+    if (data.block) {
+      document.getElementById('blockName').value = data.block.name || '';
+      document.getElementById('blockHeader').textContent = data.block.name || '-';
+    }
+    if (data.gramPanchayat) {
+      document.getElementById('gramPanchayatName').value = data.gramPanchayat.name || '';
+      document.getElementById('gpHeader').textContent = data.gramPanchayat.name || '-';
+    }
+
+    // ✅ If you want to prefill some other voter fields as well
+    // Example mock (you can replace with real data from API):
+    if (data.prefillVoter) {
+      document.querySelector('input[placeholder="Enter House No."]').value = data.prefillVoter.houseNo || '';
+      document.querySelector('input[placeholder="Name"]').value = data.prefillVoter.name || '';
+      document.querySelector('input[placeholder="Father/Husband Name"]').value = data.prefillVoter.fatherName || '';
+      document.querySelector('input[placeholder="Age"]').value = data.prefillVoter.age || '';
+      document.querySelector('input[placeholder="10 digit only"]').value = data.prefillVoter.mobile || '';
+      document.querySelector('input[placeholder="Enter Email"]').value = data.prefillVoter.email || '';
+
+      // Gender radio select
+      if (data.prefillVoter.gender) {
+        document.querySelector(`input[name="gender"][value="${data.prefillVoter.gender}"]`).checked = true;
+      }
+    }
+  });
+
+  
+  document.getElementById('backBtn').addEventListener('click', () => {
+    if (navigationData.block) {
+      ipcRenderer.send('block-selected', navigationData.block);
+    } else {
+      ipcRenderer.send('block-selected');
+    }
+  });
+</script>
+
+</body>
+
+</html>

@@ -3,240 +3,140 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sync With Server</title>
+  <title>Home</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  
   <style>
-    :root {
-      --primary-color: #1e3a8a;
-      --secondary-color: #3b82f6;
-      --accent-color: #0ea5e9;
-      --light-bg: #f8fafc;
-      --dark-text: #1e293b;
-      --success-color: #10b981;
-      --danger-color: #ef4444;
-    }
-
+     /* ===== GLOBAL STYLES ===== */
     body {
-      background-color: var(--light-bg);
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: var(--dark-text);
+      background: #f1f5f9;
+      font-family: Arial, sans-serif;
     }
 
+    /* ===== SIDEBAR COMPONENT STYLES ===== */
+    /* These styles can be reused in other files for the sidebar */
     .sidebar {
-      min-height: 100vh;
-      background: var(--primary-color);
+      background: #3949ab;
       color: white;
-      padding: 20px 10px;
-      box-shadow: 3px 0 10px rgba(0, 0, 0, 0.1);
+      min-height: 100vh;
+      padding-top: 15px;
+      transition: all 0.3s ease;
+    }
+
+    .sidebar h5 {
+      padding: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .sidebar a {
-      color: white;
-      text-decoration: none;
       display: block;
       padding: 12px 15px;
-      border-radius: 8px;
-      margin-bottom: 8px;
-      transition: all 0.3s ease;
+      color: white;
+      text-decoration: none;
+      margin: 4px 0;
+      border-radius: 4px;
     }
 
     .sidebar a:hover,
     .sidebar a.active {
-      background: var(--secondary-color);
-      transform: translateX(5px);
+      background: #5c6bc0;
     }
 
-    .sidebar h5 {
-      padding: 15px 10px;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      margin-bottom: 20px;
-    }
-
-    .form-section {
-      background: #fff;
-      border-radius: 12px;
-      padding: 25px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      margin-bottom: 25px;
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .table-section {
-      background: #fff;
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-      overflow: hidden;
-    }
-
-    input:disabled {
-      background-color: #f1f5f9 !important;
-      color: #64748b !important;
-      border-color: #e2e8f0;
-    }
-
-    .form-label {
-      font-weight: 500;
-      color: #475569;
-      margin-bottom: 8px;
-    }
-
-    .form-control, .form-select {
-      border-radius: 8px;
-      padding: 10px 15px;
-      border: 1px solid #e2e8f0;
-      transition: all 0.3s;
-    }
-
-    .form-control:focus, .form-select:focus {
-      border-color: var(--secondary-color);
-      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
-    }
-
-    .header-info {
-      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-      border-radius: 10px;
-      padding: 15px 20px;
-      margin-bottom: 25px;
-      border-left: 4px solid var(--secondary-color);
-    }
-
-    .btn-primary {
-      background: var(--secondary-color);
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-weight: 500;
-      transition: all 0.3s;
-    }
-
-    .btn-primary:hover {
-      background: #2563eb;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(37, 99, 235, 0.2);
-    }
-
-    .btn-secondary {
-      background: #94a3b8;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-weight: 500;
-    }
-
-    .btn-success {
-      background: var(--success-color);
-      border: none;
-      border-radius: 8px;
-      padding: 8px 16px;
-    }
-
-    .table thead th {
-      background: var(--primary-color);
+    /* ===== HEADER/NAVBAR COMPONENT STYLES ===== */
+    /* These styles can be reused in other files for the header */
+    .header-bar {
+      background: #3f51b5;
       color: white;
-      border: none;
-      padding: 12px 15px;
-      font-weight: 500;
+      padding: 10px 20px;
+      margin-bottom: 15px;
+      font-weight: bold;
     }
 
-    .table tbody td {
-      padding: 12px 15px;
-      vertical-align: middle;
+    .navbar-custom {
+      background: linear-gradient(to right, #3f51b5, #1a237e);
+      color: white;
     }
 
-    .table-striped tbody tr:nth-of-type(odd) {
-      background-color: #f8fafc;
+    .navbar-custom .navbar-brand,
+    .navbar-custom .nav-link,
+    .navbar-custom .navbar-toggler-icon {
+      color: white;
     }
 
-    .btn-sm {
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 0.875rem;
+    .navbar-custom .nav-link:hover {
+      color: #ffeb3b;
     }
 
-    .btn-danger {
-      background: var(--danger-color);
-      border: none;
-    }
-
-    h5, h6 {
-      color: var(--dark-text);
-      font-weight: 600;
-    }
-
-    h6 {
-      color: var(--primary-color);
-      padding-bottom: 10px;
-      border-bottom: 2px solid #e2e8f0;
-    }
-
-    .required-field::after {
-      content: " *";
-      color: var(--danger-color);
-    }
-
-    @media (max-width: 768px) {
-      .sidebar {
-        min-height: auto;
-        padding: 15px;
-      }
-      
-      .header-info {
-        padding: 12px 15px;
-      }
-    }
-  </style><!-- Reuse same CSS -->
+  </style>
 </head>
 <body>
+  <!-- ===== HEADER/NAVBAR COMPONENT ===== -->
+  <!-- This entire nav section can be reused in other files -->
+  <nav class="navbar navbar-expand-lg navbar-custom">
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <a class="navbar-brand" href="#" id="toggleSidebar">☰ SECUP Voter Entry Tool</a>
+    </div>
+  </nav>
+  
   <div class="container-fluid">
     <div class="row">
-      <!-- Sidebar -->
-      <div class="col-md-2 sidebar">
-        <h5 class="mb-4"><i class="fas fa-vote-yea me-2"></i> SECUP Tool</h5>
-       
+      <!-- ===== SIDEBAR COMPONENT ===== -->
+      <!-- This entire sidebar section can be reused in other files -->
+      <div class="col-md-2 sidebar" id="sidebar">
         <a href="#" data-page="voting"><i class="fas fa-user-plus me-2"></i>Add Voter</a>
-        <a href="#" data-page="sync" class="active"><i class="fas fa-sync me-2"></i>Sync With Server</a>
+        <a href="#" data-page="sync"  class="active"><i class="fas fa-sync me-2"></i>Sync With Server</a>
         <a href="#" data-page="update"><i class="fas fa-database me-2"></i>Update Masters</a>
         <a href="#" data-page="view" ><i class="fas fa-list me-2"></i>View All</a>
-        <a href="#" data-page="home"><i class="fas fa-home me-2"></i>Home</a>
+        <a href="#" data-page="home" ><i class="fas fa-home me-2"></i>Home</a>
       </div>
 
-      <!-- Main Content -->
-      <div class="col-md-10 p-4">
-        <div class="header-info">
-          <h5 class="mb-2"><i class="fas fa-sync me-2"></i>Sync With Server</h5>
-          <p class="mb-0 text-muted">Upload local data to server and fetch updates</p>
+      <!-- ===== MAIN CONTENT AREA ===== -->
+      <!-- This section will change based on the page -->
+      <div class="col-md-10 p-3 main-content" id="mainContent">
+        <!-- Header Bar - This could be made into a separate component if reused -->
+        <div class="header-bar">
+          Block (ब्लॉक): रामपुर नगर पंचायत | Gram Panchayat (ग्राम पंचायत): रामकोला | Ward (वार्ड): 1
         </div>
 
-        <div class="form-section">
-          <h6 class="mb-4"><i class="fas fa-cloud-upload-alt me-2"></i>Server Synchronization</h6>
-          <p>Click below to sync your offline data with the central server.</p>
-          <button class="btn btn-primary" id="syncBtn">
-            <i class="fas fa-sync-alt me-2"></i>Start Sync
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
+ 
+</body>
+<script>
+    // ===== SIDEBAR TOGGLE FUNCTIONALITY =====
+    // This script can be reused in other files for sidebar toggle
     const { ipcRenderer } = require('electron');
+    const toggleBtn = document.getElementById('toggleSidebar');
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
 
-    // Sidebar Navigation
-     document.querySelectorAll('.sidebar a').forEach(link => {
+    toggleBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Toggle sidebar visibility
+      sidebar.classList.toggle('d-none');
+      
+      // Toggle main content width
+      if (sidebar.classList.contains('d-none')) {
+        // When sidebar is hidden, make main content full width
+        mainContent.classList.remove('col-md-10');
+        mainContent.classList.add('col-12');
+      } else {
+        // When sidebar is visible, restore original width
+        mainContent.classList.remove('col-12');
+        mainContent.classList.add('col-md-10');
+      }
+    });
+    
+    // ===== NAVIGATION FUNCTIONALITY =====
+    // This script can be reused in other files for navigation
+    document.querySelectorAll('.sidebar a').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         ipcRenderer.send('navigate-to', link.getAttribute('data-page'));
       });
     });
-
-    // Sync button
-    document.getElementById('syncBtn').addEventListener('click', () => {
-      alert("Sync started! (Here you can call API for real sync)");
-    });
   </script>
-</body>
 </html>

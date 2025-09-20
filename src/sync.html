@@ -3,76 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>Sync</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
   <style>
-     /* ===== GLOBAL STYLES ===== */
+    /* ===== GLOBAL STYLES ===== */
     body {
-      background: #f1f5f9;
-      font-family: Arial, sans-serif;
+      background: white;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
 
     /* ===== SIDEBAR COMPONENT STYLES ===== */
-    /* These styles can be reused in other files for the sidebar */
     .sidebar {
-      background: #3949ab;
-      color: white;
+      background: white;
+      color: black;
       min-height: 100vh;
       padding-top: 15px;
       transition: all 0.3s ease;
+      border-right: 1px solid #ddd;
+      font-size: 13px;
     }
 
     .sidebar h5 {
       padding: 15px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 15px;
     }
 
     .sidebar a {
       display: block;
-      padding: 12px 15px;
-      color: white;
+      padding: 10px 12px;
+      color: black;
       text-decoration: none;
-      margin: 4px 0;
+      margin: 3px 0;
       border-radius: 4px;
+      font-size: 13px;
     }
 
     .sidebar a:hover,
     .sidebar a.active {
-      background: #5c6bc0;
+      background: #e6e9f5;
+      color: #1a237e;
     }
 
     /* ===== HEADER/NAVBAR COMPONENT STYLES ===== */
-    /* These styles can be reused in other files for the header */
     .header-bar {
-      background: #3f51b5;
-      color: white;
-      padding: 10px 20px;
-      margin-bottom: 15px;
+      color: black;
+      padding: 8px 15px;
+      margin-bottom: 12px;
       font-weight: bold;
+      font-size: 13px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #ddd;
     }
 
     .navbar-custom {
       background: linear-gradient(to right, #3f51b5, #1a237e);
       color: white;
+      padding: 8px 15px;
     }
 
     .navbar-custom .navbar-brand,
     .navbar-custom .nav-link,
     .navbar-custom .navbar-toggler-icon {
       color: white;
+      font-size: 15px;
     }
 
     .navbar-custom .nav-link:hover {
       color: #ffeb3b;
     }
 
+    /* ===== PAGE-SPECIFIC STYLES ===== */
+    .sync-header {
+      background: #3f51b5;
+      color: white;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-section {
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+
+    .table-section .table-header {
+      background: #3f51b5;
+      color: white;
+      padding: 8px 15px;
+      font-weight: bold;
+    }
+
+    .table thead th {
+      background: #3949ab;
+      color: white;
+    }
+
+    .btn-primary {
+      background: #3f51b5;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+    }
   </style>
 </head>
 <body>
   <!-- ===== HEADER/NAVBAR COMPONENT ===== -->
-  <!-- This entire nav section can be reused in other files -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -81,43 +129,144 @@
       <a class="navbar-brand" href="#" id="toggleSidebar">☰ SECUP Voter Entry Tool</a>
     </div>
   </nav>
-  
+
   <div class="container-fluid">
     <div class="row">
       <!-- ===== SIDEBAR COMPONENT ===== -->
-      <!-- This entire sidebar section can be reused in other files -->
       <div class="col-md-2 sidebar" id="sidebar">
-        <a href="#" data-page="voting"><i class="fas fa-user-plus me-2"></i>Add Voter</a>
-        <a href="#" data-page="sync"  class="active"><i class="fas fa-sync me-2"></i>Sync With Server</a>
+        <a href="#" data-page="voting" ><i class="fas fa-user-plus me-2"></i>Add Voter</a>
+        <a href="#" data-page="sync" class="active"><i class="fas fa-sync me-2"></i>Sync With Server</a>
         <a href="#" data-page="update"><i class="fas fa-database me-2"></i>Update Masters</a>
-        <a href="#" data-page="view" ><i class="fas fa-list me-2"></i>View All</a>
-        <a href="#" data-page="home" ><i class="fas fa-home me-2"></i>Home</a>
+        <a href="#" data-page="view"><i class="fas fa-list me-2"></i>View All</a>
+        <a href="#" data-page="home"><i class="fas fa-home me-2"></i>Home</a>
       </div>
 
       <!-- ===== MAIN CONTENT AREA ===== -->
-      <!-- This section will change based on the page -->
       <div class="col-md-10 p-3 main-content" id="mainContent">
-        <!-- Header Bar - This could be made into a separate component if reused -->
-        <div class="header-bar">
-          Block (ब्लॉक): रामपुर नगर पंचायत | Gram Panchayat (ग्राम पंचायत): रामकोला | Ward (वार्ड): 1
+        <!-- Sync Header -->
+        <div class="sync-header">
+          <span>Sync, अब तक के 200 मतदाता के डेटा पर सिंक करें</span>
+          <button class="btn btn-primary">SYNC WITH SERVER</button>
         </div>
 
- 
-</body>
-<script>
+        <!-- Voter Sync Table -->
+        <div class="table-section">
+          <div class="table-header">Sync Voters</div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>S.No.</th>
+                  <th>HouseNo</th>
+                  <th>Name</th>
+                  <th>Father/Husband</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Email</th>
+                  <th>UID</th>
+                  <th>ContactNo</th>
+                  <th>YearOfBirth</th>
+                  <th>PSName</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>12</td>
+                  <td>राम सिंह</td>
+                  <td>गोविंद सिंह</td>
+                  <td>पुरुष</td>
+                  <td>55</td>
+                  <td>ram@mail.com</td>
+                  <td>12345</td>
+                  <td>9876543210</td>
+                  <td>1965</td>
+                  <td>रामपुर बूथ</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>13</td>
+                  <td>सीता देवी</td>
+                  <td>हरि प्रसाद</td>
+                  <td>महिला</td>
+                  <td>45</td>
+                  <td>sita@mail.com</td>
+                  <td>12346</td>
+                  <td>9876543211</td>
+                  <td>1975</td>
+                  <td>रामकोला बूथ</td>
+                </tr>
+                <tr>
+                  <td>3</td>
+                  <td>14</td>
+                  <td>राहुल कुमार</td>
+                  <td>विजय कुमार</td>
+                  <td>पुरुष</td>
+                  <td>30</td>
+                  <td>rahul@mail.com</td>
+                  <td>12347</td>
+                  <td>9876543212</td>
+                  <td>1990</td>
+                  <td>रामपुर बूथ</td>
+                </tr>
+                <tr>
+                  <td>4</td>
+                  <td>15</td>
+                  <td>प्रीति शर्मा</td>
+                  <td>रमेश शर्मा</td>
+                  <td>महिला</td>
+                  <td>35</td>
+                  <td>preeti@mail.com</td>
+                  <td>12348</td>
+                  <td>9876543213</td>
+                  <td>1985</td>
+                  <td>रामकोला बूथ</td>
+                </tr>
+                <tr>
+                  <td>5</td>
+                  <td>16</td>
+                  <td>अजय यादव</td>
+                  <td>सुरेश यादव</td>
+                  <td>पुरुष</td>
+                  <td>40</td>
+                  <td>ajay@mail.com</td>
+                  <td>12349</td>
+                  <td>9876543214</td>
+                  <td>1980</td>
+                  <td>रामपुर बूथ</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
     // ===== SIDEBAR TOGGLE FUNCTIONALITY =====
-    // This script can be reused in other files for sidebar toggle
     const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('set-all-data', (event, data) => {
+      navigationData = data;
+      console.log('Received all data:', data);
+    });
+    
+    window.addEventListener('load', () => {
+      ipcRenderer.send('request-data-on-refresh', 'voting');
+    });
+    
     const toggleBtn = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
 
     toggleBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      
+
       // Toggle sidebar visibility
       sidebar.classList.toggle('d-none');
-      
+
       // Toggle main content width
       if (sidebar.classList.contains('d-none')) {
         // When sidebar is hidden, make main content full width
@@ -129,9 +278,8 @@
         mainContent.classList.add('col-md-10');
       }
     });
-    
+
     // ===== NAVIGATION FUNCTIONALITY =====
-    // This script can be reused in other files for navigation
     document.querySelectorAll('.sidebar a').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
@@ -139,4 +287,5 @@
       });
     });
   </script>
+</body>
 </html>

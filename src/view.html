@@ -3,76 +3,136 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Home</title>
+  <title>View</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-     /* ===== GLOBAL STYLES ===== */
+    /* ===== GLOBAL STYLES ===== */
     body {
-      background: #f1f5f9;
-      font-family: Arial, sans-serif;
+      background: white;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Segoe UI', Arial, sans-serif;
     }
 
     /* ===== SIDEBAR COMPONENT STYLES ===== */
-    /* These styles can be reused in other files for the sidebar */
     .sidebar {
-      background: #3949ab;
-      color: white;
+      background: white;
+      color: black;
       min-height: 100vh;
       padding-top: 15px;
       transition: all 0.3s ease;
+      border-right: 1px solid #ddd;
+      font-size: 13px;
     }
 
     .sidebar h5 {
       padding: 15px;
       border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      font-size: 15px;
     }
 
     .sidebar a {
       display: block;
-      padding: 12px 15px;
-      color: white;
+      padding: 10px 12px;
+      color: black;
       text-decoration: none;
-      margin: 4px 0;
+      margin: 3px 0;
       border-radius: 4px;
+      font-size: 13px;
     }
 
     .sidebar a:hover,
     .sidebar a.active {
-      background: #5c6bc0;
+      background: #e6e9f5;
+      color: #1a237e;
     }
 
     /* ===== HEADER/NAVBAR COMPONENT STYLES ===== */
-    /* These styles can be reused in other files for the header */
     .header-bar {
-      background: #3f51b5;
-      color: white;
-      padding: 10px 20px;
-      margin-bottom: 15px;
+      color: black;
+      padding: 8px 15px;
+      margin-bottom: 12px;
       font-weight: bold;
+      font-size: 13px;
+      background-color: #f8f9fa;
+      border-radius: 4px;
+      border: 1px solid #ddd;
     }
 
     .navbar-custom {
       background: linear-gradient(to right, #3f51b5, #1a237e);
       color: white;
+      padding: 8px 15px;
     }
 
     .navbar-custom .navbar-brand,
     .navbar-custom .nav-link,
     .navbar-custom .navbar-toggler-icon {
       color: white;
+      font-size: 15px;
     }
 
     .navbar-custom .nav-link:hover {
       color: #ffeb3b;
     }
 
+    /* ===== PAGE-SPECIFIC STYLES ===== */
+    .view-header {
+      background: #3f51b5;
+      color: white;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-section {
+      border: 1px solid #ddd;
+      margin-bottom: 20px;
+    }
+
+    .table-section .table-header {
+      background: #3f51b5;
+      color: white;
+      padding: 8px 15px;
+      font-weight: bold;
+    }
+
+    .table thead th {
+      background: #3949ab;
+      color: white;
+    }
+
+    .btn-primary {
+      background: #3f51b5;
+      border: none;
+      color: white;
+      padding: 5px 15px;
+    }
+
+    .modal-content {
+      background: #f8f9fa;
+      border: 1px solid #ddd;
+    }
+
+    .modal-header {
+      background: #3f51b5;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <!-- ===== HEADER/NAVBAR COMPONENT ===== -->
-  <!-- This entire nav section can be reused in other files -->
   <nav class="navbar navbar-expand-lg navbar-custom">
     <div class="container-fluid">
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent">
@@ -81,43 +141,164 @@
       <a class="navbar-brand" href="#" id="toggleSidebar">☰ SECUP Voter Entry Tool</a>
     </div>
   </nav>
-  
+
   <div class="container-fluid">
     <div class="row">
       <!-- ===== SIDEBAR COMPONENT ===== -->
-      <!-- This entire sidebar section can be reused in other files -->
       <div class="col-md-2 sidebar" id="sidebar">
         <a href="#" data-page="voting" ><i class="fas fa-user-plus me-2"></i>Add Voter</a>
         <a href="#" data-page="sync"><i class="fas fa-sync me-2"></i>Sync With Server</a>
         <a href="#" data-page="update"><i class="fas fa-database me-2"></i>Update Masters</a>
-        <a href="#" data-page="view"class="active" ><i class="fas fa-list me-2"></i>View All</a>
-        <a href="#" data-page="home" ><i class="fas fa-home me-2"></i>Home</a>
+        <a href="#" data-page="view" class="active"><i class="fas fa-list me-2"></i>View All</a>
+        <a href="#" data-page="home"><i class="fas fa-home me-2"></i>Home</a>
       </div>
 
       <!-- ===== MAIN CONTENT AREA ===== -->
-      <!-- This section will change based on the page -->
       <div class="col-md-10 p-3 main-content" id="mainContent">
-        <!-- Header Bar - This could be made into a separate component if reused -->
-        <div class="header-bar">
-          Block (ब्लॉक): रामपुर नगर पंचायत | Gram Panchayat (ग्राम पंचायत): रामकोला | Ward (वार्ड): 1
+        <!-- View Header -->
+        <div class="view-header">
+          <div class="row w-50">
+            <div class="col-md-6">
+              <label class="me-2">Ward (वार्ड):</label>
+              <select class="form-select form-select-sm">
+                <option value="">All</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="me-2">Status:</label>
+              <select class="form-select form-select-sm">
+                <option value="">All</option>
+                <option value="Synced">Synced</option>
+                <option value="Not Synced">Not Synced</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm me-2">VIEW</button>
+            <button class="btn btn-primary btn-sm" id="exportExcel">EXCEL</button>
+          </div>
         </div>
 
- 
-</body>
-<script>
+        <!-- Voter View Table -->
+        <div class="table-section">
+          <div class="table-header">View Voters</div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped table-hover mb-0" id="voterTable">
+              <thead>
+                <tr>
+                  <th>Ward</th>
+                  <th>HouseNo</th>
+                  <th>Name</th>
+                  <th>Father/Husband</th>
+                  <th>Gender</th>
+                  <th>Age</th>
+                  <th>Email</th>
+                  <th>UID</th>
+                  <th>ContactNo</th>
+                  <th>YearOfBirth</th>
+                  <th>PSName</th>
+                  <th>GP/Ward</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>23</td>
+                  <td>राम प्रसाद</td>
+                  <td>शyam प्रसाद</td>
+                  <td>पुरुष</td>
+                  <td>18</td>
+                  <td>ram@mail.com</td>
+                  <td>12345</td>
+                  <td>9876543210</td>
+                  <td>2005</td>
+                  <td>रामपुर बूथ</td>
+                  <td>1-रामकोला</td>
+                  <td>Not Synced</td>
+                </tr>
+                <tr>
+                  <td>2</td>
+                  <td>24</td>
+                  <td>सीता देवी</td>
+                  <td>हरि प्रसाद</td>
+                  <td>महिला</td>
+                  <td>25</td>
+                  <td>sita@mail.com</td>
+                  <td>12346</td>
+                  <td>9876543211</td>
+                  <td>1998</td>
+                  <td>रामकोला बूथ</td>
+                  <td>2-रामपुर</td>
+                  <td>Synced</td>
+                </tr>
+                <tr>
+                  <td>1</td>
+                  <td>25</td>
+                  <td>राहुल कुमार</td>
+                  <td>विजय कुमार</td>
+                  <td>पुरुष</td>
+                  <td>30</td>
+                  <td>rahul@mail.com</td>
+                  <td>12347</td>
+                  <td>9876543212</td>
+                  <td>1993</td>
+                  <td>रामपुर बूथ</td>
+                  <td>1-रामकोला</td>
+                  <td>Not Synced</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Export Success -->
+  <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exportModalLabel">Message</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          Excel file created, you can find the file in My Documents
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">OK</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
     // ===== SIDEBAR TOGGLE FUNCTIONALITY =====
-    // This script can be reused in other files for sidebar toggle
     const { ipcRenderer } = require('electron');
+
+    ipcRenderer.on('set-all-data', (event, data) => {
+      navigationData = data;
+      console.log('Received all data:', data);
+    });
+    
+    window.addEventListener('load', () => {
+      ipcRenderer.send('request-data-on-refresh', 'voting');
+    });
+    
     const toggleBtn = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');
 
     toggleBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      
+
       // Toggle sidebar visibility
       sidebar.classList.toggle('d-none');
-      
+
       // Toggle main content width
       if (sidebar.classList.contains('d-none')) {
         // When sidebar is hidden, make main content full width
@@ -129,14 +310,25 @@
         mainContent.classList.add('col-md-10');
       }
     });
-    
+
     // ===== NAVIGATION FUNCTIONALITY =====
-    // This script can be reused in other files for navigation
     document.querySelectorAll('.sidebar a').forEach(link => {
       link.addEventListener('click', (e) => {
         e.preventDefault();
         ipcRenderer.send('navigate-to', link.getAttribute('data-page'));
       });
     });
+
+    // ===== EXCEL EXPORT FUNCTIONALITY =====
+    document.getElementById('exportExcel').addEventListener('click', () => {
+      const table = document.getElementById('voterTable');
+      const wb = XLSX.utils.table_to_book(table, { sheet: "Voters" });
+      XLSX.writeFile(wb, 'VoterData_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+
+      // Show modal after export
+      const modal = new bootstrap.Modal(document.getElementById('exportModal'));
+      modal.show();
+    });
   </script>
+</body>
 </html>

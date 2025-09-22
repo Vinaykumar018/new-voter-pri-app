@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-      "start": "electronmon ."
-
+    "start": "electronmon ."
   },
   "keywords": [],
   "author": "",
@@ -12,7 +11,8 @@
   "description": "",
   "dependencies": {
     "bootstrap": "^5.3.8",
-    "electron": "^38.1.1"
+    "electron": "^38.1.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "electronmon": "^2.0.3"

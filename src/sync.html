@@ -6,7 +6,6 @@
   <title>Sync</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
   <style>
     /* ===== GLOBAL STYLES ===== */
     body {
@@ -117,6 +116,139 @@
       color: white;
       padding: 5px 15px;
     }
+
+    .btn-primary:hover {
+      background: #3949ab;
+    }
+
+    /* Instruction text style */
+    .instruction-text {
+      background-color: #fff3cd;
+      color: #856404;
+      padding: 10px 15px;
+      border-radius: 4px;
+      border: 1px solid #ffeeba;
+      margin-bottom: 15px;
+      font-size: 13px;
+    }
+
+    /* Progress bar styles */
+    .progress-container {
+      margin: 15px 0;
+      display: none;
+    }
+    
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    
+    .progress-bar {
+      height: 20px;
+      background-color: #e0e0e0;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: #4caf50;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    /* Toast Notification Styles */
+    .toastify {
+      padding: 12px 20px;
+      color: #fff;
+      display: inline-block;
+      background: #4caf50;
+      position: fixed;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      max-width: calc(50% - 20px);
+      z-index: 2147483647;
+      box-shadow: 0 3px 6px -1px rgba(0, 0, 0, 0.12), 0 10px 36px -4px rgba(77, 96, 232, 0.3);
+    }
+
+    .toastify.on {
+      opacity: 1;
+    }
+
+    .toast-close {
+      opacity: 0.4;
+      padding: 0 5px;
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: transparent;
+      border: 0;
+      color: #fff;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 1em;
+      font-weight: bold;
+      line-height: 1;
+    }
+
+    .toastify-right {
+      right: 15px;
+    }
+
+    .toastify-left {
+      left: 15px;
+    }
+
+    .toastify-top {
+      top: 15px;
+    }
+
+    .toastify-bottom {
+      bottom: 15px;
+    }
+
+    .toastify-rounded {
+      border-radius: 25px;
+    }
+
+    .toastify-avatar {
+      width: 1.5em;
+      height: 1.5em;
+      margin: 0 5px;
+      border-radius: 50%;
+    }
+
+    .toastify-center {
+      margin-left: auto;
+      margin-right: auto;
+      left: 0;
+      right: 0;
+      max-width: fit-content;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(255,255,255,.3);
+      border-radius: 50%;
+      border-top-color: #fff;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* Border for sync button when active */
+    .syncing {
+      border: 2px solid #4caf50 !important;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.6);
+    }
   </style>
 </head>
 <body>
@@ -145,15 +277,33 @@
       <div class="col-md-10 p-3 main-content" id="mainContent">
         <!-- Sync Header -->
         <div class="sync-header">
-          <span>Sync, अब तक के 200 मतदाता के डेटा पर सिंक करें</span>
-          <button class="btn btn-primary">SYNC WITH SERVER</button>
+          <span id="syncHeaderText">Sync, अब तक के 0 मतदाता के डेटा पर सिंक करें</span>
+          <button class="btn btn-primary" id="syncButton">
+            <i class="fas fa-sync me-1"></i> SYNC WITH SERVER
+          </button>
+        </div>
+
+        <!-- Instruction Text -->
+        <div class="instruction-text">
+          <i class="fas fa-info-circle me-2"></i> निर्देश: एक बार में केवल 200 मतदाता ही सर्वर पर सिंक होंगे
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-info">
+            <span id="progressText">Processing: 0%</span>
+            <span id="progressCount">0/0 records</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
         </div>
 
         <!-- Voter Sync Table -->
         <div class="table-section">
           <div class="table-header">Sync Voters</div>
           <div class="table-responsive">
-            <table class="table table-bordered table-striped table-hover mb-0">
+            <table class="table table-bordered table-striped table-hover mb-0" id="votersTable">
               <thead>
                 <tr>
                   <th>S.No.</th>
@@ -169,72 +319,8 @@
                   <th>PSName</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>12</td>
-                  <td>राम सिंह</td>
-                  <td>गोविंद सिंह</td>
-                  <td>पुरुष</td>
-                  <td>55</td>
-                  <td>ram@mail.com</td>
-                  <td>12345</td>
-                  <td>9876543210</td>
-                  <td>1965</td>
-                  <td>रामपुर बूथ</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>13</td>
-                  <td>सीता देवी</td>
-                  <td>हरि प्रसाद</td>
-                  <td>महिला</td>
-                  <td>45</td>
-                  <td>sita@mail.com</td>
-                  <td>12346</td>
-                  <td>9876543211</td>
-                  <td>1975</td>
-                  <td>रामकोला बूथ</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>14</td>
-                  <td>राहुल कुमार</td>
-                  <td>विजय कुमार</td>
-                  <td>पुरुष</td>
-                  <td>30</td>
-                  <td>rahul@mail.com</td>
-                  <td>12347</td>
-                  <td>9876543212</td>
-                  <td>1990</td>
-                  <td>रामपुर बूथ</td>
-                </tr>
-                <tr>
-                  <td>4</td>
-                  <td>15</td>
-                  <td>प्रीति शर्मा</td>
-                  <td>रमेश शर्मा</td>
-                  <td>महिला</td>
-                  <td>35</td>
-                  <td>preeti@mail.com</td>
-                  <td>12348</td>
-                  <td>9876543213</td>
-                  <td>1985</td>
-                  <td>रामकोला बूथ</td>
-                </tr>
-                <tr>
-                  <td>5</td>
-                  <td>16</td>
-                  <td>अजय यादव</td>
-                  <td>सुरेश यादव</td>
-                  <td>पुरुष</td>
-                  <td>40</td>
-                  <td>ajay@mail.com</td>
-                  <td>12349</td>
-                  <td>9876543214</td>
-                  <td>1980</td>
-                  <td>रामपुर बूथ</td>
-                </tr>
+              <tbody id="votersTableBody">
+                <!-- Data will be populated by JavaScript -->
               </tbody>
             </table>
           </div>
@@ -246,17 +332,208 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script>
     // ===== SIDEBAR TOGGLE FUNCTIONALITY =====
+   
     const { ipcRenderer } = require('electron');
 
-    ipcRenderer.on('set-all-data', (event, data) => {
-      navigationData = data;
-      console.log('Received all data:', data);
-    });
-    
+    // Constants
+    const BATCH_SIZE = 200; // Number of records to sync in each batch
+
     window.addEventListener('load', () => {
-      ipcRenderer.send('request-data-on-refresh', 'voting');
+      // Load voter data from localStorage
+      loadVoterData();
+      
+      // Set up sync button event listener
+      document.getElementById('syncButton').addEventListener('click', syncData);
     });
-    
+
+    // Function to load voter data from localStorage
+    function loadVoterData() {
+      const voters = JSON.parse(localStorage.getItem('voters') || '[]');
+      const tableBody = document.getElementById('votersTableBody');
+      const syncHeaderText = document.getElementById('syncHeaderText');
+      
+      // Update header text with count
+      syncHeaderText.textContent = `Sync, अब तक के ${voters.length} मतदाता के डेटा पर सिंक करें`;
+      
+      // Clear existing table rows
+      tableBody.innerHTML = '';
+      
+      // Add voters to table
+      voters.forEach((voter, index) => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${index + 1}</td>
+          <td>${voter.houseNumber}</td>
+          <td>${voter.fullName}</td>
+          <td>${voter.parentName}</td>
+          <td>${voter.gender}</td>
+          <td>${voter.age}</td>
+          <td>${voter.email}</td>
+          <td>${voter.aadhaar}</td>
+          <td>${voter.mobile}</td>
+          <td>${voter.yearOfBirth}</td>
+          <td>${voter.votingCenter}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Function to show toast notification
+    function showToast(message, type = 'success') {
+      // Create toast element
+      const toast = document.createElement('div');
+      toast.className = `toastify toastify-top toastify-right${type === 'error' ? ' toastify-error' : ''}`;
+      toast.style.backgroundColor = type === 'error' ? '#f44336' : '#4caf50';
+      
+      // Create close button
+      const closeButton = document.createElement('button');
+      closeButton.className = 'toast-close';
+      closeButton.innerHTML = '&times;';
+      closeButton.onclick = () => {
+        toast.classList.remove('on');
+        setTimeout(() => toast.remove(), 400);
+      };
+      
+      // Add message and close button to toast
+      toast.innerHTML = message;
+      toast.appendChild(closeButton);
+      
+      // Add toast to document
+      document.body.appendChild(toast);
+      
+      // Position toast (adjust based on existing toasts)
+      const toasts = document.querySelectorAll('.toastify');
+      const topPosition = 15 + (toasts.length - 1) * 60;
+      toast.style.top = `${topPosition}px`;
+      
+      // Show toast with animation
+      setTimeout(() => toast.classList.add('on'), 100);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.classList.remove('on');
+          setTimeout(() => toast.remove(), 400);
+        }
+      }, 5000);
+    }
+
+    // Function to update progress bar
+    function updateProgress(current, total) {
+      const progressContainer = document.getElementById('progressContainer');
+      const progressFill = document.getElementById('progressFill');
+      const progressText = document.getElementById('progressText');
+      const progressCount = document.getElementById('progressCount');
+      
+      const percentage = Math.round((current / total) * 100);
+      
+      progressFill.style.width = `${percentage}%`;
+      progressText.textContent = `Processing: ${percentage}%`;
+      progressCount.textContent = `${current}/${total} records`;
+      
+      // Show progress container if not already visible
+      if (progressContainer.style.display !== 'block') {
+        progressContainer.style.display = 'block';
+      }
+    }
+
+    // Function to sync data with server in batches
+    async function syncData() {
+      const syncButton = document.getElementById('syncButton');
+      const originalText = syncButton.innerHTML;
+      const voters = JSON.parse(localStorage.getItem('voters') || '[]');
+      
+      if (voters.length === 0) {
+        showToast('कोई डेटा सिंक करने के लिए नहीं है', 'error');
+        return;
+      }
+      
+      // Show loading state and add border to button
+      syncButton.disabled = true;
+      syncButton.classList.add('syncing');
+      syncButton.innerHTML = '<span class="loading"></span> SYNCING...';
+      
+      try {
+        // Calculate number of batches needed
+        const totalBatches = Math.ceil(voters.length / BATCH_SIZE);
+        let successfulBatches = 0;
+        
+        // Process data in batches
+       for (let batchIndex = 0; batchIndex < totalBatches; batchIndex++) {
+  const startIndex = batchIndex * BATCH_SIZE;
+  const endIndex = Math.min(startIndex + BATCH_SIZE, voters.length);
+  const batchData = voters.slice(startIndex, endIndex);
+
+  // Map your local voter data to API fields
+  const batch = batchData.map(voter => ({
+    name: voter.fullName || "",                 // from local data
+    parent_name: voter.parentName || "",       // from local data
+    house_number: voter.houseNumber || "",     // from local data
+     gender: (voter.gender === "पुरुष") ? "Male" 
+           : (voter.gender === "महिला") ? "Female" 
+           : "",               // from local data
+    age: parseInt(voter.age) || 0,             // convert to number
+    dob: voter.yearOfBirth ? `${voter.yearOfBirth}-01-01` : "2000-01-01", // static default
+    mobile_number: voter.mobile || "",         // from local data
+    email: voter.email || "",                  // from local data
+    addhar_number: voter.aadhaar || "",        // from local data
+    polling_id: 1,                             // static value
+    panchyat_id: 1,                            // static value
+    block_id: 1,                               // static value
+    district_id: 1,                            // static value
+    votingCenter: voter.votingCenter || "Default Center", // local or static
+    votingPlace: voter.votingPlace || "Default Place",    // local or static
+    ward: voter.ward || "1"                    // from local data
+  }));
+
+  // Update progress
+  updateProgress(endIndex, voters.length);
+
+  // Call API for this batch
+  const response = await fetch('https://demo.deifichrservices.com/api/syncdata', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: batch })
+  });
+
+  if (response.ok) {
+    successfulBatches++;
+
+    // Optional: delay for demonstration
+    await new Promise(resolve => setTimeout(resolve, 500));
+  } else {
+    throw new Error(`Server returned an error for batch ${batchIndex + 1}`);
+  }
+}
+
+        
+        // If all batches were successful
+        if (successfulBatches === totalBatches) {
+          // Show success message
+          showToast('डेटा सफलतापूर्वक सिंक हो गया!');
+          
+          // Clear local storage and table after successful sync
+          localStorage.removeItem('voters');
+          loadVoterData();
+        } else {
+          throw new Error(`Only ${successfulBatches} out of ${totalBatches} batches were successful`);
+        }
+      } catch (error) {
+        console.error('Sync error:', error);
+        showToast('सिंक विफल: ' + error.message, 'error');
+      } finally {
+        // Hide progress bar
+        document.getElementById('progressContainer').style.display = 'none';
+        
+        // Restore button state and remove border
+        syncButton.disabled = false;
+        syncButton.classList.remove('syncing');
+        syncButton.innerHTML = originalText;
+      }
+    }
+
     const toggleBtn = document.getElementById('toggleSidebar');
     const sidebar = document.getElementById('sidebar');
     const mainContent = document.getElementById('mainContent');

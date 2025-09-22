@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,9 +6,8 @@
   <title>View</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="stylesheet" href="style.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  
   <style>
     /* ===== GLOBAL STYLES ===== */
     body {
@@ -129,6 +128,22 @@
       background: #3f51b5;
       color: white;
     }
+    
+    .loading-indicator {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
+    
+    .status-synced {
+      color: green;
+      font-weight:normal;
+    }
+    
+    .status-not-synced {
+      color: orange;
+      font-weight: normal;
+    }
   </style>
 </head>
 <body>
@@ -158,27 +173,43 @@
         <!-- View Header -->
         <div class="view-header">
           <div class="row w-50">
-            <div class="col-md-6">
+            <div class="col-md-5">
               <label class="me-2">Ward (वार्ड):</label>
-              <select class="form-select form-select-sm">
+              <select class="form-select form-select-sm" id="wardFilter">
                 <option value="">All</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
+                <!-- More options will be populated dynamically -->
               </select>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-5">
               <label class="me-2">Status:</label>
-              <select class="form-select form-select-sm">
+              <select class="form-select form-select-sm" id="statusFilter">
                 <option value="">All</option>
                 <option value="Synced">Synced</option>
                 <option value="Not Synced">Not Synced</option>
               </select>
+              
             </div>
+            <div class="col-md-2 mt-3">
+               <button class="btn btn-secondary btn-sm me-2" id="viewButton">VIEW</button>
+            </div>
+              
+         
           </div>
+           
           <div>
-            <button class="btn btn-primary btn-sm me-2">VIEW</button>
-            <button class="btn btn-primary btn-sm" id="exportExcel">EXCEL</button>
+           
+            <button class="btn btn-danger btn-sm" id="exportExcel">EXCEL</button>
           </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading-indicator" id="loadingIndicator">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="mt-2">Loading data...</p>
         </div>
 
         <!-- Voter View Table -->
@@ -203,52 +234,8 @@
                   <th>Status</th>
                 </tr>
               </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>23</td>
-                  <td>राम प्रसाद</td>
-                  <td>शyam प्रसाद</td>
-                  <td>पुरुष</td>
-                  <td>18</td>
-                  <td>ram@mail.com</td>
-                  <td>12345</td>
-                  <td>9876543210</td>
-                  <td>2005</td>
-                  <td>रामपुर बूथ</td>
-                  <td>1-रामकोला</td>
-                  <td>Not Synced</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>24</td>
-                  <td>सीता देवी</td>
-                  <td>हरि प्रसाद</td>
-                  <td>महिला</td>
-                  <td>25</td>
-                  <td>sita@mail.com</td>
-                  <td>12346</td>
-                  <td>9876543211</td>
-                  <td>1998</td>
-                  <td>रामकोला बूथ</td>
-                  <td>2-रामपुर</td>
-                  <td>Synced</td>
-                </tr>
-                <tr>
-                  <td>1</td>
-                  <td>25</td>
-                  <td>राहुल कुमार</td>
-                  <td>विजय कुमार</td>
-                  <td>पुरुष</td>
-                  <td>30</td>
-                  <td>rahul@mail.com</td>
-                  <td>12347</td>
-                  <td>9876543212</td>
-                  <td>1993</td>
-                  <td>रामपुर बूथ</td>
-                  <td>1-रामकोला</td>
-                  <td>Not Synced</td>
-                </tr>
+              <tbody id="voterTableBody">
+                <!-- Data will be populated dynamically -->
               </tbody>
             </table>
           </div>
@@ -319,16 +306,279 @@
       });
     });
 
-    // ===== EXCEL EXPORT FUNCTIONALITY =====
-    document.getElementById('exportExcel').addEventListener('click', () => {
-      const table = document.getElementById('voterTable');
-      const wb = XLSX.utils.table_to_book(table, { sheet: "Voters" });
-      XLSX.writeFile(wb, 'VoterData_' + new Date().toISOString().slice(0, 10) + '.xlsx');
+    // ===== DATA MANAGEMENT =====
+    let allVotersData = [];
+    let filteredVotersData = [];
 
-      // Show modal after export
-      const modal = new bootstrap.Modal(document.getElementById('exportModal'));
-      modal.show();
-    });
+    // Function to get data from localStorage
+   function getLocalStorageData() {
+  const voters = [];
+  const votersData = localStorage.getItem('voters');
+  
+  if (votersData) {
+    try {
+      const parsedData = JSON.parse(votersData);
+      
+      // Check if it's an array
+      if (Array.isArray(parsedData)) {
+        parsedData.forEach(voter => {
+          voter.status = 'Not Synced'; // Mark as not synced
+          voters.push(voter);
+        });
+      } else if (typeof parsedData === 'object') {
+        // Handle case where it might be a single object
+        parsedData.status = 'Not Synced';
+        voters.push(parsedData);
+      }
+    } catch (e) {
+      console.error('Error parsing voter data from localStorage:', e);
+    }
+  }
+  
+  return voters;
+}
+
+    // Function to fetch data from API
+  async function fetchAPIData() {
+ 
+  try {
+    const response = await fetch('https://demo.deifichrservices.com/api/get-all-voter');
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch data from API');
+    }
+
+    const apiData = await response.json(); // Get the JSON body
+    const dataArray = apiData.data || []; // Assuming your API wraps voters in a 'data' field
+
+    // Transform API fields to your local format
+    const transformedData = dataArray.map(voter => ({
+      houseNumber: voter.house_number || "",
+      fullName: voter.name || "",
+      parentName: voter.parent_name || "",
+      gender: voter.gender === "पुरुष" ? "Male" : voter.gender === "महिला" ? "Female" : voter.gender || "",
+      age: voter.age || "",
+      yearOfBirth: voter.dob ? voter.dob.split("-")[0] : "", // extract year from dob
+      mobile: voter.mobile_number || "",
+      aadhaar: voter.addhar_number || "",
+      email: voter.email || "",
+      votingCenter: voter.votingCenter || "",
+      votingPlace: voter.votingPlace || "",
+      block: voter.block_id || "", // static value if needed
+      gramPanchayat: voter.panchyat_id || "", // static value if needed
+      ward: voter.ward || "",
+      status: "Synced"
+    }));
+
+    return transformedData;
+  } catch (error) {
+    console.error('Error fetching data from API:', error);
+    return [];
+  }
+}
+
+
+    // Function to load and combine data
+    async function loadData() {
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const voterTableBody = document.getElementById('voterTableBody');
+      
+      // Show loading indicator
+      loadingIndicator.style.display = 'block';
+      voterTableBody.innerHTML = '';
+      
+      try {
+        // Get data from both sources
+        const localStorageData = getLocalStorageData();
+        const apiData = await fetchAPIData();
+        
+        // Combine data
+        allVotersData = [...localStorageData, ...apiData];
+        
+        // Populate ward filter with unique wards
+        populateWardFilter(allVotersData);
+        
+        // Apply initial filters
+        applyFilters();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        voterTableBody.innerHTML = '<tr><td colspan="13" class="text-center text-danger">Error loading data</td></tr>';
+      } finally {
+        // Hide loading indicator
+        loadingIndicator.style.display = 'none';
+      }
+    }
+
+    // Function to populate ward filter
+    function populateWardFilter(voters) {
+      const wardFilter = document.getElementById('wardFilter');
+      const wards = new Set();
+      
+      // Get all unique wards
+      voters.forEach(voter => {
+        if (voter.ward) {
+          wards.add(voter.ward.toString());
+        }
+      });
+      
+      // Clear existing options except "All"
+      while (wardFilter.options.length > 1) {
+        wardFilter.remove(1);
+      }
+      
+      // Add ward options
+      const sortedWards = Array.from(wards).sort((a, b) => parseInt(a) - parseInt(b));
+      sortedWards.forEach(ward => {
+        const option = document.createElement('option');
+        option.value = ward;
+        option.textContent = ward;
+        wardFilter.appendChild(option);
+      });
+    }
+
+    // Function to apply filters
+    function applyFilters() {
+      console.log("clicked")
+      const wardFilter = document.getElementById('wardFilter').value;
+      const statusFilter = document.getElementById('statusFilter').value;
+      
+      // Apply filters
+      filteredVotersData = allVotersData.filter(voter => {
+        let include = true;
+        
+        // Ward filter
+        if (wardFilter && voter.ward !== wardFilter) {
+          include = false;
+        }
+        
+        // Status filter
+        if (statusFilter && voter.status !== statusFilter) {
+          include = false;
+        }
+        
+        return include;
+      });
+      
+      // Render the filtered data
+      renderVoterTable(filteredVotersData);
+    }
+
+    // Function to render voter table
+   // Update your renderVoterTable function to handle property name differences
+function renderVoterTable(voters) {
+  
+  const voterTableBody = document.getElementById('voterTableBody');
+  
+  if (voters.length === 0) {
+    voterTableBody.innerHTML = '<tr><td colspan="13" class="text-center">No data found</td></tr>';
+    return;
+  }
+  
+  voterTableBody.innerHTML = '';
+  
+  voters.forEach(voter => {
+    console.log(voter)
+    const row = document.createElement('tr');
+    
+    // Add class based on status
+    if (voter.status === 'Synced') {
+      row.classList.add('status-synced');
+    } else {
+      row.classList.add('status-not-synced');
+    }
+    
+    // Map the properties from your data to the table columns
+   
+    row.innerHTML = `
+      <td>${voter.ward || ''}</td>
+      <td>${voter.houseNumber || voter.houseNo || ''}</td>
+      <td>${voter.fullName || voter.name || ''}</td>
+      <td>${voter.parentName || voter.fatherHusband || ''}</td>
+      <td>${voter.gender || ''}</td>
+      <td>${voter.age || ''}</td>
+      <td>${voter.email || ''}</td>
+      <td>${voter.aadhaar || voter.uid || ''}</td>
+      <td>${voter.mobile || voter.contactNo || ''}</td>
+      <td>${voter.yearOfBirth || ''}</td>
+      <td>${voter.votingCenter || voter.psName || ''}</td>
+      <td>${voter.gramPanchayat || voter.gpWard || ''}</td>
+      <td>${voter.status || ''}</td>
+    `;
+    
+    voterTableBody.appendChild(row);
+  });
+}
+
+    // ===== EXCEL EXPORT FUNCTIONALITY =====
+   
+
+function exportToCSV(voters) {
+  if (!voters || voters.length === 0) {
+    alert('No data to export');
+    return;
+  }
+
+  const csv = [];
+  
+  // Add headers
+  csv.push([
+    "Block",
+    "Gram Panchayat",
+    "Ward",
+    "House No.",
+    "Name",
+    "Father/Husband",
+    "Gender",
+    "Age",
+    "Email",
+    "UID",
+    "Contact No.",
+    "Year Of Birth",
+    "PS Name"
+  ]);
+
+  // Add data rows
+  voters.forEach(voter => {
+    csv.push([
+      voter.block || "",
+      voter.gramPanchayat || "",
+      voter.ward || "",
+      voter.houseNumber || "",
+      voter.fullName || "",
+      voter.parentName || "",
+      voter.gender || "",
+      voter.age || "",
+      voter.email || "",
+      voter.aadhaar || "",
+      voter.mobile || "",
+      voter.yearOfBirth || "",
+      voter.votingPlace || ""
+    ]);
+  });
+
+  // Convert to CSV string
+  const csvContent = "data:text/csv;charset=utf-8," + csv.map(row => row.join(',')).join('\n');
+
+  // Create temporary download link
+  const link = document.createElement('a');
+  link.setAttribute('href', encodeURI(csvContent));
+  link.setAttribute('download', 'VoterData_' + new Date().toISOString().slice(0, 10) + '.csv');
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+// Hook to button
+document.getElementById('exportExcel').addEventListener('click', () => {
+  exportToCSV(filteredVotersData);
+});
+
+
+    // Event listeners for filters
+    document.getElementById('viewButton').addEventListener('click', applyFilters);
+    
+    // Load data when page is ready
+    document.addEventListener('DOMContentLoaded', loadData);
   </script>
 </body>
 </html>

@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Select District</title>
+  <title>जिला चुनें</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
- <style>
+  <style>
     body {
       background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
       min-height: 100vh;
@@ -19,19 +19,41 @@
       border: none;
       border-radius: 12px;
       box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+      overflow: hidden;
     }
     .card-header {
-      background: linear-gradient(to right, #0d6efd, #0a58ca);
+      background: #1e3a8a;
       color: white;
-      border-radius: 12px 12px 0 0 !important;
+      border-radius: 0;
       font-weight: 600;
+      padding: 15px;
+    }
+    .instructions-section {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 0 12px 12px 0;
+      height: 100%;
+    }
+    .instructions-section h5 {
+      margin-bottom: 15px;
+      font-size: 1.25rem;
+      color: #dc3545;
+      font-weight: bolder;
+    }
+    .note {
+      color: black;
+      font-size: 0.9rem;
+      margin-top: 10px;
+    }
+    .table-section {
+      border-right: 2px solid #dee2e6;
     }
     .table-hover tbody tr {
       transition: all 0.2s ease;
-      cursor: pointer; /* Pointer cursor for all table rows */
+      cursor: pointer;
     }
     .table-hover tbody tr:hover {
-      background-color: rgba(13, 110, 253, 0.1);
+      background-color: rgba(30, 58, 138, 0.1);
       transform: translateX(4px);
     }
     .loading-spinner {
@@ -48,6 +70,17 @@
       background-color: rgba(255, 255, 255, 0.3);
       border: 1px solid rgba(255, 255, 255, 0.4);
     }
+    .search-input {
+      width: 100%;
+      padding: 8px 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+    th {
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -56,36 +89,44 @@
       <div class="col-lg-10">
         <div class="card shadow">
           <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h5 class="card-title mb-0"><i class="fas fa-map-marked-alt me-2"></i>Select a District</h5>
+            <h5 class="card-title mb-0"><i class="fas fa-landmark me-2"></i>जिला चुनें</h5>
             <button class="btn btn-sm btn-refresh" id="refreshBtn">
-              <i class="fas fa-sync-alt me-1"></i>Refresh
+              <i class="fas fa-sync-alt me-1"></i>रीफ्रेश
             </button>
           </div>
-          <div class="card-body p-0">
-            <div class="table-responsive">
-              <table class="table table-hover table-striped mb-0">
-                <thead class="table-light">
-                  <tr>
-                    <th class="px-4">ID</th>
-                    <th>District Name</th>
-                    <th>Number</th>
-                  </tr>
-                </thead>
-                <tbody id="districtTableBody">
-                  <tr>
-                    <td colspan="3" class="text-center py-5">
-                      <div class="spinner-border text-primary loading-spinner mb-2" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                      </div>
-                      <p class="text-muted mb-0">Loading districts...</p>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+          <div class="row g-0">
+            <div class="col-md-8 table-section">
+              <div class="card-body p-4">
+                <input type="text" class="search-input" id="searchInput" placeholder="जिला खोजें...">
+                <div class="table-responsive">
+                  <table class="table table-hover table-striped mb-0">
+                    <thead class="table-light">
+                      <tr>
+                        <th>जिला का नाम</th>
+                      </tr>
+                    </thead>
+                    <tbody id="districtTableBody">
+                      <tr>
+                        <td colspan="1" class="text-center py-5">
+                          <div class="spinner-border text-primary loading-spinner mb-2" role="status">
+                            <span class="visually-hidden">लोड हो रहा है...</span>
+                          </div>
+                          <p class="text-muted mb-0">जिले लोड हो रहे हैं...</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="card-footer text-muted py-2">
-            <small><i class="fas fa-info-circle me-1"></i>Click on a district to select it</small>
+            <div class="col-md-4 instructions-section">
+              <h5>INSTRUCTION</h5>
+              <div class="note">
+                <p>1. कृपया केवल एक जिला चुनें।</p>
+                <p>2. अपने जिले का चयन करने के लिए तालिका पर क्लिक करें।</p>
+                <p>3. किसी भी त्रुटि के लिए सहायता के लिए संपर्क करें।</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -94,16 +135,17 @@
 
   <script>
     const { ipcRenderer } = require('electron');
+    let districts = []; // To store all districts for filtering
 
     async function loadDistricts() {
       const tbody = document.getElementById('districtTableBody');
       tbody.innerHTML = `
         <tr>
-          <td colspan="3" class="text-center py-5">
+          <td colspan="1" class="text-center py-5">
             <div class="spinner-border text-primary loading-spinner mb-2" role="status">
-              <span class="visually-hidden">Loading...</span>
+              <span class="visually-hidden">लोड हो रहा है...</span>
             </div>
-            <p class="text-muted mb-0">Loading districts...</p>
+            <p class="text-muted mb-0">जिले लोड हो रहे हैं...</p>
           </td>
         </tr>
       `;
@@ -112,32 +154,16 @@
         const res = await fetch('https://demo.deifichrservices.com/api/all-district');
         const json = await res.json();
         tbody.innerHTML = "";
+        districts = []; // Reset districts array
 
         if (json.status === 200 && Array.isArray(json.data)) {
-          json.data.forEach(d => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td class="px-4 fw-bold">${d.id}</td>
-              <td class="fw-semibold">${d.name}</td>
-              <td><span class="badge bg-primary">${d.number}</span></td>
-            `;
-            // Click row to select district - send the complete district object
-            row.addEventListener('click', () => {
-              // Add visual feedback
-              document.querySelectorAll('tr').forEach(r => r.classList.remove('table-active'));
-              row.classList.add('table-active');
-              
-              setTimeout(() => {
-                ipcRenderer.send('district-selected', d); // Send the complete district object
-              }, 300);
-            });
-            tbody.appendChild(row);
-          });
+          districts = json.data;
+          renderDistricts(districts);
         } else {
           tbody.innerHTML = `
             <tr>
-              <td colspan="3" class="text-center py-4 text-danger">
-                <i class="fas fa-exclamation-triangle me-2"></i>No districts found
+              <td colspan="1" class="text-center py-4 text-danger">
+                <i class="fas fa-exclamation-triangle me-2"></i>कोई जिला नहीं मिला
               </td>
             </tr>
           `;
@@ -146,18 +172,43 @@
         console.error(err);
         tbody.innerHTML = `
           <tr>
-            <td colspan="3" class="text-center py-4 text-danger">
-              <i class="fas fa-exclamation-circle me-2"></i>Error loading districts
+            <td colspan="1" class="text-center py-4 text-danger">
+              <i class="fas fa-exclamation-circle me-2"></i>जिला लोड करने में त्रुटि
             </td>
           </tr>
         `;
       }
     }
 
-    // Add event listener for refresh button
+    function renderDistricts(data) {
+      const tbody = document.getElementById('districtTableBody');
+      tbody.innerHTML = "";
+      data.forEach(d => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td class="fw-semibold">${d.name}</td>
+        `;
+        row.addEventListener('click', () => {
+          document.querySelectorAll('tr').forEach(r => r.classList.remove('table-active'));
+          row.classList.add('table-active');
+          
+          setTimeout(() => {
+            ipcRenderer.send('district-selected', d);
+          }, 300);
+        });
+        tbody.appendChild(row);
+      });
+    }
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+      const searchTerm = this.value.trim().toLowerCase();
+      const filteredDistricts = districts.filter(d => d.name.toLowerCase().includes(searchTerm));
+      renderDistricts(filteredDistricts);
+    });
+
     document.getElementById('refreshBtn').addEventListener('click', loadDistricts);
 
-    // Initial load
     loadDistricts();
   </script>
 
